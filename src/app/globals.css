@@ -1,0 +1,71 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #F7F6F3;
+  --bg-soft: #FFFFFF;
+  --border: #E4E1D8;
+  --text: #1A1D23;
+  --muted: #6B7280;
+}
+
+.dark {
+  --bg: #12151A;
+  --bg-soft: #181C22;
+  --border: #262B33;
+  --text: #EDEEF0;
+  --muted: #7A8290;
+}
+
+@layer base {
+  body {
+    background-color: var(--bg);
+    background-image: radial-gradient(circle at 1px 1px, rgba(128,128,128,0.06) 1px, transparent 0);
+    background-size: 24px 24px;
+    transition: background-color 0.2s ease;
+  }
+
+  ::selection {
+    background: #E8A33D;
+    color: #12151A;
+  }
+
+  *:focus-visible {
+    outline: 2px solid #E8A33D;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .skeleton {
+    background: linear-gradient(90deg, var(--border) 25%, var(--bg-soft) 37%, var(--border) 63%);
+    background-size: 400% 100%;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

@@ -1,0 +1,205 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String?
+  timezone      String?
+  language      String?   @default("en")
+  accounts      Account[]
+  sessions      Session[]
+  memberships   WorkspaceMember[]
+  actionItems   ActionItem[]      @relation("AssignedTo")
+  apiKeys       ApiKey[]
+  createdAt     DateTime  @default(now())
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  @@unique([identifier, token])
+}
+
+model Workspace {
+  id              String            @id @default(cuid())
+  name            String
+  slug            String            @unique
+  slackWebhookUrl String?
+  createdAt       DateTime          @default(now())
+  members         WorkspaceMember[]
+  meetings        Meeting[]
+  templates       Template[]
+  invites         Invite[]
+}
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model WorkspaceMember {
+  id          String        @id @default(cuid())
+  workspaceId String
+  userId      String
+  role        WorkspaceRole @default(MEMBER)
+  joinedAt    DateTime      @default(now())
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([workspaceId, userId])
+}
+
+enum InviteStatus {
+  PENDING
+  ACCEPTED
+  REVOKED
+}
+
+model Invite {
+  id          String        @id @default(cuid())
+  workspaceId String
+  email       String
+  role        WorkspaceRole @default(MEMBER)
+  token       String        @unique @default(cuid())
+  status      InviteStatus  @default(PENDING)
+  createdAt   DateTime      @default(now())
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model Template {
+  id           String   @id @default(cuid())
+  workspaceId  String
+  name         String
+  description  String?
+  defaultTitle String?
+  promptHint   String?  @db.Text
+  createdAt    DateTime @default(now())
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+}
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  userId     String
+  name       String
+  keyHash    String
+  keyPreview String
+  createdAt  DateTime  @default(now())
+  lastUsedAt DateTime?
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum MeetingStatus {
+  SCHEDULED
+  LIVE
+  ENDED
+  PROCESSING
+  READY
+}
+
+model Meeting {
+  id            String        @id @default(cuid())
+  workspaceId   String
+  title         String
+  scheduledAt   DateTime?
+  startedAt     DateTime?
+  endedAt       DateTime?
+  status        MeetingStatus @default(SCHEDULED)
+  roomName      String?       @unique
+  roomUrl       String?
+  googleEventId String?
+  templateId    String?
+  createdAt     DateTime      @default(now())
+  workspace     Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  transcript    Transcript?
+  summary       Summary?
+  actionItems   ActionItem[]
+  notifications Notification[]
+}
+
+model Transcript {
+  id        String   @id @default(cuid())
+  meetingId String   @unique
+  rawText   String   @db.Text
+  audioUrl  String?
+  createdAt DateTime @default(now())
+  meeting Meeting          @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  chunks  TranscriptChunk[]
+}
+
+model TranscriptChunk {
+  id           String   @id @default(cuid())
+  transcriptId String
+  content      String   @db.Text
+  chunkIndex   Int
+  embedding    Unsupported("vector(384)")?
+  createdAt    DateTime @default(now())
+  transcript Transcript @relation(fields: [transcriptId], references: [id], onDelete: Cascade)
+  @@index([transcriptId])
+}
+
+model Summary {
+  id        String   @id @default(cuid())
+  meetingId String   @unique
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  meeting Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
+
+model ActionItem {
+  id         String   @id @default(cuid())
+  meetingId  String
+  text       String
+  assigneeId String?
+  done       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  meeting  Meeting @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+  assignee User?   @relation("AssignedTo", fields: [assigneeId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  meetingId String?
+  userId    String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+  meeting Meeting? @relation(fields: [meetingId], references: [id], onDelete: Cascade)
+}
