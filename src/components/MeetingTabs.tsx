@@ -5,8 +5,7 @@ import VideoCallFrame from "./VideoCallFrame";
 import EmptyState from "./EmptyState";
 
 type Meeting = {
-  roomUrl?: string;
-  // add other meeting fields you already use here
+  roomUrl?: string | null;
   [key: string]: any;
 };
 
