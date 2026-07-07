@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import AppShell from "@/components/AppShell";
 import { Waveform } from "@/components/Waveform";
@@ -12,8 +12,8 @@ type Template = { id: string; name: string; defaultTitle: string | null };
 export default function NewMeetingPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const urlWorkspaceId = searchParams.get("workspaceId") ?? "";
-  const urlTemplateId = searchParams.get("templateId") ?? "";
+  const urlWorkspaceId = "";
+const urlTemplateId = "";
 
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [workspaceId, setWorkspaceId] = useState(urlWorkspaceId);
