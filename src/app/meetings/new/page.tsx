@@ -11,9 +11,10 @@ type Template = { id: string; name: string; defaultTitle: string | null };
 
 export default function NewMeetingPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
+
   const urlWorkspaceId = "";
-const urlTemplateId = "";
+  const urlTemplateId = "";
+
 
   const [workspaces, setWorkspaces] = useState<Workspace[]>([]);
   const [workspaceId, setWorkspaceId] = useState(urlWorkspaceId);
