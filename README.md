@@ -8,7 +8,7 @@ templates, workspaces, and analytics.
 
 ## 🌐 Live Demo
 
-**https://echonote-h61b9jpl2-rutvilandges-projects.vercel.app**
+https://echonote-kxtr3j16v-rutvilandges-projects.vercel.app/
 
 ---
 
