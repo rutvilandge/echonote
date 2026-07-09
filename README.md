@@ -1,100 +1,224 @@
-# EchoNote — AI Meeting Assistant for Smarter Teams
+# 🎙️ EchoNote
 
-Records meetings, generates AI summaries, extracts action items, and keeps
-teams organized. Built on Next.js, TypeScript, Prisma, PostgreSQL, NextAuth,
-Daily.co, and Groq — all on free-tier infrastructure.
+> **AI-Powered Meeting Intelligence Platform**
+> Meetings generate valuable decisions, but notes, action items, and
+follow-ups are often forgotten. **EchoNote** centralizes meetings into
+one intelligent workspace with AI-generated summaries, transcripts,
+templates, workspaces, and analytics.
 
-## Setup
+## 🌐 Live Demo
 
-### 1. Install
+**https://echonote-h61b9jpl2-rutvilandges-projects.vercel.app**
+
+---
+
+## ✨ Features
+
+- 🔐 Authentication (Email/Password, Google, GitHub OAuth)
+- 👥 Multi-workspace support with roles (Owner/Admin/Member)
+- 🎥 Daily.co live video meetings
+- 📝 AI-generated meeting summaries (Groq / Llama 3.3 70B)
+- 📜 Meeting transcripts (drag-and-drop upload, chunked + embedded)
+- 💬 Chat with meetings — RAG over transcripts via pgvector
+- ✅ AI-extracted action items, tracked to completion
+- 🧩 Meeting templates (Sprint Planning, Stand-up, Interview, and more)
+- 📅 Calendar view + automatic Google Calendar sync
+- 🔔 Real-time notifications, searchable and filterable
+- 🔍 Global search (⌘K / Ctrl+K) across meetings, action items, members
+- 📊 Analytics dashboard with real charts, computed from live data
+- 🔗 Slack notifications via incoming webhook
+- 🔑 Personal API keys (SHA-256 hashed, shown once)
+- 🌙 Dark / light theme, command palette, toast notifications
+
+---
+
+## 🛠 Tech Stack
+
+| Layer            | Technology                     |
+|------------------|---------------------------------|
+| Frontend         | Next.js 14 (App Router), React, TypeScript |
+| Styling          | Tailwind CSS                    |
+| Backend          | Next.js Route Handlers          |
+| ORM              | Prisma                          |
+| Database         | PostgreSQL + pgvector           |
+| Authentication   | NextAuth (Google, GitHub, Credentials) |
+| AI               | Groq (Llama 3.3 70B)            |
+| Embeddings       | @xenova/transformers (local, free) |
+| Video            | Daily.co                        |
+| Animation        | Framer Motion                   |
+| Charts           | Recharts                        |
+| Command Palette  | cmdk                            |
+| Email            | Resend (optional)               |
+| Deployment       | Vercel                          |
+
+---
+
+## 🏗 Architecture
+
+```text
+Browser
+   │
+Next.js App (App Router)
+   │
+API Route Handlers
+ ├── Prisma → PostgreSQL (+ pgvector)
+ ├── Groq AI (summaries, RAG chat)
+ ├── @xenova/transformers (local embeddings)
+ ├── Daily.co (video rooms)
+ ├── Slack (incoming webhook notifications)
+ └── Resend (email, optional)
+```
+
+---
+
+## 📂 Folder Structure
+
+```text
+echonote/
+├── prisma/
+│   └── schema.prisma
+├── src/
+│   ├── app/
+│   │   ├── api/            # meetings, transcripts, summarize, chat,
+│   │   │                   # notifications, templates, workspaces,
+│   │   │                   # analytics, search, auth
+│   │   ├── dashboard/
+│   │   ├── meetings/
+│   │   ├── calendar/
+│   │   ├── members/
+│   │   ├── templates/
+│   │   ├── workspace/
+│   │   ├── settings/
+│   │   ├── analytics/
+│   │   └── login/ register/
+│   ├── components/
+│   └── lib/                # auth, ai, prisma, daily, embeddings, notify
+├── package.json
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
+
 ```bash
+git clone https://github.com/rutvilandge/echonote.git
+cd echonote
 npm install
-```
-
-### 2. Neon (free Postgres)
-1. neon.tech → new project → copy connection string → `.env` as `DATABASE_URL`
-2. In Neon's SQL editor:
-   ```sql
-   CREATE EXTENSION IF NOT EXISTS vector;
-   ```
-3. Then:
-   ```bash
-   npx prisma migrate dev --name init
-   npx prisma generate
-   ```
-
-### 3. Auth (pick what you want)
-- **Email/password** — works with zero setup
-- **Google** (console.cloud.google.com) — also enables Calendar sync.
-  Redirect URI: `http://localhost:3000/api/auth/callback/google`.
-  Enable the Google Calendar API too.
-- **GitHub** (github.com/settings/developers) — no billing account needed.
-  Callback URL: `http://localhost:3000/api/auth/callback/github`
-
-### 4. Groq (free LLM) — console.groq.com → `.env` as `GROQ_API_KEY`
-### 5. Daily.co (free video) — dashboard.daily.co → `.env` as `DAILY_API_KEY`
-### 6. NEXTAUTH_SECRET
-```bash
-openssl rand -base64 32
-```
-### 7. Run
-```bash
+cp .env.example .env
+npx prisma migrate dev --name init
+npx prisma generate
 npm run dev
 ```
-→ http://localhost:3000
 
-**Your only job: fill in `.env`.** Copy `.env.example` to `.env` and paste in
-the keys from steps 2–6.
+Visit `http://localhost:3000`
 
-## What's real (backed by the database, not mocked)
+---
 
-- Landing page, auth (Google/GitHub/email), registration
-- Dashboard — real Prisma-aggregated stats: total/upcoming/today's meetings,
-  workspaces, summaries generated, pending/completed action items,
-  completion rate, plus charts (meetings/month, action item status,
-  workspace activity, trend line) and an AI insights panel
-- Meetings — create, edit, delete, video call (Daily.co, duplicate-iframe
-  bug fixed), templates, transcript upload, AI summary, action items, chat
-- Calendar — real month view + automatic Google Calendar sync (if signed in
-  with Google)
-- Members — invite by email, roles, remove
-- Templates — CRUD, selectable when creating a meeting, steers the AI
-  summary prompt
-- Notifications — real-time creation on events, search, filter, mark-read,
-  delete, relative timestamps ("2h ago")
-- Global search (⌘K) — searches meetings, action items, templates, and
-  members live
-- Workspace settings — rename, delete, transfer ownership, Slack webhook
-- Analytics — same real data as the dashboard, in more detail
-- Settings, Profile, API Keys (SHA-256 hashed, shown once)
-- /help, /privacy, /contact pages
+## 🔑 Environment Variables
 
-## Known limitations, stated honestly
+```env
+DATABASE_URL=
+NEXTAUTH_URL=
+NEXTAUTH_SECRET=
+GITHUB_CLIENT_ID=
+GITHUB_CLIENT_SECRET=
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GROQ_API_KEY=
+DAILY_API_KEY=
+RESEND_API_KEY=
+```
 
-- Zoom, Microsoft Teams, Notion, Jira, Linear, ClickUp, Outlook Calendar
-  integrations are not built — each needs its own OAuth developer app.
-  Slack works via incoming webhook (no OAuth needed), under Workspace settings.
-- No billing/payment processing — this app has no paid tier by design.
-- Average meeting duration only populates once meetings have both a
-  `startedAt` and `endedAt` timestamp recorded (not wired to the video call
-  lifecycle yet — a good next step would be setting these on Daily.co's
-  `joined-meeting` / `left-meeting` events).
+`DATABASE_URL` needs a PostgreSQL instance with the `vector` extension
+enabled (`CREATE EXTENSION IF NOT EXISTS vector;`) — Neon and Prisma
+Postgres both support this on their free tiers.
 
-## Bug fixes in this version
+---
 
-- **Duplicate DailyIframe instances** — `VideoRoom.tsx` now guards against
-  React 18's double-effect in dev mode and destroys any stray instance
-  before creating a new one.
-- **Hydration mismatches on dates** — all locale-formatted dates now use
-  `suppressHydrationWarning`, since server/client locale can differ.
-- **"workspaceId required" on meeting creation** — the new-meeting form now
-  fetches your workspaces itself instead of depending solely on a URL
-  param, and auto-selects your first workspace.
+## 🤖 AI Workflow
 
-## Free-tier limits
+```text
+Meeting
+   ↓
+Video call (Daily.co) + Transcript upload
+   ↓
+Chunk + embed transcript (local, free)
+   ↓
+Groq AI → Summary + Decisions + Action Items
+   ↓
+pgvector similarity search
+   ↓
+Chat with meeting (RAG) + Dashboard analytics
+```
 
-| Service | Free limit |
-|---|---|
-| Neon | 0.5 GB storage, generous compute hours |
-| Daily.co | 10,000 participant-minutes/month |
-| Groq | Rate-limited, no monthly cap on free tier |
+---
+
+## 🗄 Database Models
+
+- User, Account, Session
+- Workspace, WorkspaceMember, Invite
+- Meeting, Transcript, TranscriptChunk
+- Summary, ActionItem
+- Template
+- Notification
+- ApiKey
+
+---
+
+## 📈 Roadmap
+
+- [x] Authentication (Google, GitHub, email/password)
+- [x] Workspaces + roles
+- [x] AI summaries + action items
+- [x] Live video meetings
+- [x] Meeting templates
+- [x] Calendar view + Google Calendar sync
+- [x] Slack notifications (incoming webhook)
+- [x] Global search + command palette
+- [ ] Automatic recording → transcription pipeline
+- [ ] Zoom / Microsoft Teams integration
+- [ ] Mobile app
+- [ ] Speaker recognition
+- [ ] Export to PDF
+
+---
+
+## 💡 Challenges
+
+- Designing a relational Prisma schema that supports multi-workspace RBAC
+- Wiring RAG (retrieval-augmented generation) over meeting transcripts with pgvector
+- Avoiding duplicate video call instances under React 18 strict mode
+- Handling SSR/CSR hydration consistently for theme and locale-dependent UI
+- Keeping the whole stack on free-tier infrastructure without sacrificing features
+- Serverless deployment and environment variable management on Vercel
+
+---
+
+## 📚 What I Learned
+
+- Full-stack development with the Next.js App Router
+- Prisma ORM and relational schema design
+- PostgreSQL + vector search with pgvector
+- Multi-provider authentication with NextAuth
+- Building RAG pipelines with local embeddings + an LLM API
+- Real-time video integration with Daily.co
+- Deploying and debugging a serverless app on Vercel
+
+---
+
+## 🤝 Contributing
+
+Fork the repository, create a feature branch, commit your changes, and
+open a Pull Request.
+
+## 📄 License
+
+MIT
+
+---
+
+<p align="center">
+Built with ❤️ by <strong>Rutvi Landge</strong><br/>
+⭐ If you like this project, consider starring the repository.
+</p>
