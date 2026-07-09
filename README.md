@@ -166,23 +166,6 @@ Chat with meeting (RAG) + Dashboard analytics
 
 ---
 
-## 📈 Roadmap
-
-- [x] Authentication (Google, GitHub, email/password)
-- [x] Workspaces + roles
-- [x] AI summaries + action items
-- [x] Live video meetings
-- [x] Meeting templates
-- [x] Calendar view + Google Calendar sync
-- [x] Slack notifications (incoming webhook)
-- [x] Global search + command palette
-- [ ] Automatic recording → transcription pipeline
-- [ ] Zoom / Microsoft Teams integration
-- [ ] Mobile app
-- [ ] Speaker recognition
-- [ ] Export to PDF
-
----
 
 ## 💡 Challenges
 
